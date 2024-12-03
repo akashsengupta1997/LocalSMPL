@@ -76,14 +76,15 @@ def create_widget(measurements):
     sliders = []
     for i, meas in enumerate(measurements):
         slider_pos = (
-            0.2, 0.1 + i * (slider_height + 0.01), 0.4, slider_height
+            0.3, 0.25 - i * (slider_height + 0.01), 0.4, slider_height
         )
         slider = create_slider(slider_pos, meas)
 
         meas_idx = ALL_MEAS_NAMES_NO_SYMM.index(meas)
-        slider.on_changed(lambda val, slider=slider,
-                                 meas_idx=meas_idx:
-                          update_slider(val, meas_idx, slider))
+        slider.on_changed(
+            lambda val, slider=slider, meas_idx=meas_idx:
+            update_slider(val, meas_idx, slider)
+        )
         sliders.append(slider)
 
     return sliders
@@ -126,10 +127,14 @@ if __name__ == '__main__':
     )
 
     orig_betas = torch.zeros(1, meas2betas_model.shape[1])
+    # Try modifying the base body shape by uncommenting either of the following
+    # orig_betas[:, 1] = -4.
+    # orig_betas[:, 3] = -2.
+
     meas_deltas = torch.zeros(1, meas2betas_model.shape[0])
 
     renderer = Renderer(faces=smpl_model.faces)
-    fig, (ax_front, ax_side) = plt.subplots(1, 2, figsize=(10, 5))
+    fig, (ax_front, ax_side) = plt.subplots(1, 2, figsize=(10, 6))
 
     # Initial render
     vertices = smpl_model(betas=orig_betas).vertices[0].numpy()
@@ -148,7 +153,7 @@ if __name__ == '__main__':
     ax_front.set_title('Front View')
     ax_side.axis('off')
     ax_side.set_title('Side View')
-    plt.subplots_adjust(bottom=0.25)
+    plt.subplots_adjust(bottom=0.35)
 
     # Run slider widget
     sliders = create_widget(args.measurements)
