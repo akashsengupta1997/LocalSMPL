@@ -71,7 +71,7 @@ def create_slider(slider_pos, slider_label):
     return slider
 
 
-def run_widget(measurements):
+def create_widget(measurements):
     slider_height = 0.03
     sliders = []
     for i, meas in enumerate(measurements):
@@ -85,6 +85,8 @@ def run_widget(measurements):
                                  meas_idx=meas_idx:
                           update_slider(val, meas_idx, slider))
         sliders.append(slider)
+
+    return sliders
 
 
 if __name__ == '__main__':
@@ -149,6 +151,6 @@ if __name__ == '__main__':
     plt.subplots_adjust(bottom=0.25)
 
     # Run slider widget
-    run_widget(args.measurements)
+    sliders = create_widget(args.measurements)
 
     plt.show()
