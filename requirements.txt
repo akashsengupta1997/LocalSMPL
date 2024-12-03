@@ -1,0 +1,6 @@
+numpy<2.0
+smplx
+torch
+matplotlib
+loguru
+pyrender
