@@ -5,7 +5,7 @@ This may be useful for 3D body shape estimation and controllable 3D avatar gener
 
 Further details can be found in the paper:  
 **Probabilistic Estimation of 3D Human Shape and Pose with a Semantic Local Parametric Model**  
-[Akash Sengupta](https://akashsengupta1997.github.io/), [Ignas Budvytis]([http://mi.eng.cam.ac.uk/~ib255/](https://ignasbud.github.io/)), [Roberto Cipolla](https://mi.eng.cam.ac.uk/~cipolla/)  
+[Akash Sengupta](https://akashsengupta1997.github.io/), [Ignas Budvytis](https://ignasbud.github.io/), [Roberto Cipolla](https://mi.eng.cam.ac.uk/~cipolla/)  
 BMVC 2021  
 [[paper+supplmentary]](https://arxiv.org/abs/2111.15404)  
 
