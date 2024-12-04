@@ -61,6 +61,7 @@ Try manipulating the sliders after running:
 ```bash
 python slider.py --measurements Hip_Width Hip_Depth Chest_Width Chest_Depth Underbust_Depth
 ```
+Please ensure that you are using an appropriate backend for Matplotlib.
 If the visualisation is running slowly, 
 append `--no_render` to the above command to replace rendering with a point-based visualisation.
 This will also visualise the definitions of different measurements.
