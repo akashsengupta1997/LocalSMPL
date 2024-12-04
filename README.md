@@ -32,10 +32,10 @@ Download the neutral, male and female SMPL model files from [here](https://smpl.
 **Please ensure that you download version 1.1.0 with 300 shape PCs!**  
 You will need to make the SMPL model files compatible with Python 3 by removing any Chumpy objects. 
 To do so, please follow the instructions [here](https://github.com/vchoutas/smplx/tree/master/tools).  
-Then, rename and place the SMPL model files in the `model_files` directory, which should have the following structure:
+Then, rename and place the SMPL model files in the `models` directory, which should have the following structure:
 
     LocalSMPL
-    ├── model_files                           # Folder with model files
+    ├── models                           # Folder with model files
     │   ├── smpl_300
     │   │   ├── SMPL_NEUTRAL.pkl              # Gender-neutral SMPL model with 300 PCs
     │   │   ├── SMPL_MALE.pkl                 # Male SMPL model with 300 PCs
