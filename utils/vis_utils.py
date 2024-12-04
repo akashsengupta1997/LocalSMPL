@@ -5,7 +5,7 @@ import trimesh
 from configs.measurements import (
     VERTEX_LENGTH_MEAS_INDEXES,
     VERTEX_CIRCUMFERENCE_MEAS_INDEXES,
-    JOINT_LENGTH_MEAS_INDEXES,
+    JOINT_LENGTH_MEAS_INDEXES
 )
 
 
@@ -82,7 +82,7 @@ class Renderer:
         return imgs
 
 
-def initialise_meas_lines(ax_front, ax_side, vertices):
+def initialise_meas_lines(ax_front, ax_side, vertices, joints):
 
     vertex_len_plots = {'front': [], 'side': []}
     for id_pair in VERTEX_LENGTH_MEAS_INDEXES:
@@ -118,24 +118,47 @@ def initialise_meas_lines(ax_front, ax_side, vertices):
             )
         )
 
+    joint_len_plots = {'front': [], 'side': []}
+    for id_pair in JOINT_LENGTH_MEAS_INDEXES:
+        joint_len_plots['front'].extend(
+            ax_front.plot(
+                joints[id_pair, 0],
+                joints[id_pair, 1],
+                c='orange'
+            )
+        )
+        joint_len_plots['side'].extend(
+            ax_side.plot(
+                joints[id_pair, 2],
+                joints[id_pair, 1],
+                c='orange'
+            )
+        )
+
     return {
         'vertex_length': vertex_len_plots,
         'vertex_circum': vertex_circum_plots,
+        'joint_length': joint_len_plots
     }
 
 
-def update_meas_lines(meas_plots_dict, vertices):
+def update_meas_lines(meas_plots_dict, vertices, joints):
 
     for plot_type, plots in meas_plots_dict.items():
         if plot_type == 'vertex_length':
             idxs = VERTEX_LENGTH_MEAS_INDEXES
+            points = vertices
         elif plot_type == 'vertex_circum':
             idxs = VERTEX_CIRCUMFERENCE_MEAS_INDEXES
+            points = vertices
+        elif plot_type == 'joint_length':
+            idxs = JOINT_LENGTH_MEAS_INDEXES
+            points = joints
         else:
             raise NotImplementedError
 
         for i, id_pair in enumerate(idxs):
-            plots['front'][i].set_xdata(vertices[id_pair, 0])
-            plots['front'][i].set_ydata(vertices[id_pair, 1])
-            plots['side'][i].set_xdata(vertices[id_pair, 2])
-            plots['side'][i].set_ydata(vertices[id_pair, 1])
+            plots['front'][i].set_xdata(points[id_pair, 0])
+            plots['front'][i].set_ydata(points[id_pair, 1])
+            plots['side'][i].set_xdata(points[id_pair, 2])
+            plots['side'][i].set_ydata(points[id_pair, 1])

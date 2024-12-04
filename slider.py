@@ -20,10 +20,10 @@ from utils.vis_utils import (
 from configs.measurements import ALL_MEAS_NAMES_NO_SYMM
 
 
-def update_scatter(new_vertices):
+def update_scatter(new_vertices, new_joints):
     scatter_front.set_offsets(np.c_[new_vertices[:, 0], new_vertices[:, 1]])
     scatter_side.set_offsets(np.c_[new_vertices[:, 2], new_vertices[:, 1]])
-    update_meas_lines(meas_plots, new_vertices)
+    update_meas_lines(meas_plots, new_vertices, new_joints)
     fig.canvas.draw_idle()
 
 def update_render(new_vertices):
@@ -37,18 +37,16 @@ def update_slider(val, meas_idx, slider):
 
     # -------- LOCAL SEMANTIC SMPL SHAPE --------
     new_betas = orig_betas + torch.matmul(meas_deltas, meas2betas_model)
-    new_vertices = smpl_model(betas=new_betas).vertices[0].numpy()
+    smpl_out = smpl_model(betas=new_betas)
+    new_vertices = smpl_out.vertices[0].numpy()
+    new_joints = smpl_out.joints[0].numpy()
 
     if args.no_render:
-        update_scatter(new_vertices)
+        update_scatter(new_vertices, new_joints)
     else:
         update_render(new_vertices)
 
 def create_slider(slider_pos, slider_label):
-    """
-    Create and return a slider for the given position and label.
-    The slider values are displayed in centimeters.
-    """
     ax_slider = fig.add_axes(slider_pos, facecolor='lightgoldenrodyellow')
 
     # Define the slider
@@ -75,6 +73,8 @@ def create_widget(measurements):
     slider_height = 0.03
     sliders = []
     for i, meas in enumerate(measurements):
+        assert meas in ALL_MEAS_NAMES_NO_SYMM, f'{meas} is not a valid measurement.'
+
         slider_pos = (
             0.3, 0.25 - i * (slider_height + 0.01), 0.4, slider_height
         )
@@ -102,11 +102,29 @@ if __name__ == '__main__':
     parser.add_argument(
         '--measurements',
         '-M',
+        type=str,
         nargs='+',
+        required=True,
+        help='Measurements to visualise on slider.'
     )
     parser.add_argument(
         '--no_render',
-        action='store_true'
+        action='store_true',
+        help='Display scatter plot instead of render.'
+    )
+    parser.add_argument(
+        '--base_shape',
+        type=int,
+        default=0,
+        choices=(0, 1, 2),
+        help='Choose out of a few pre-defined base SMPL body shapes.',
+    )
+    parser.add_argument(
+        '-resolution',
+        '-R',
+        type=int,
+        default=300,
+        help='Resolution of renders - use lower values for better performance.'
     )
     args = parser.parse_args()
 
@@ -126,22 +144,28 @@ if __name__ == '__main__':
         f'Loaded {args.gender} SMPL model with {smpl_model.num_betas} shape betas.'
     )
 
+    logger.info(f'Using pre-defined base shape {args.base_shape}.')
     orig_betas = torch.zeros(1, meas2betas_model.shape[1])
-    # Try modifying the base body shape by uncommenting either of the following
-    # orig_betas[:, 1] = -4.
-    # orig_betas[:, 3] = -2.
+    if args.base_shape == 1:
+        orig_betas[:, 1] = -4.
+    elif args.base_shape == 2:
+        orig_betas[:, 0] = -0.2
+        orig_betas[:, 1] = 2.
+        orig_betas[:, 3] = -2.
 
     meas_deltas = torch.zeros(1, meas2betas_model.shape[0])
 
-    renderer = Renderer(faces=smpl_model.faces)
+    renderer = Renderer(faces=smpl_model.faces, image_size=args.resolution)
     fig, (ax_front, ax_side) = plt.subplots(1, 2, figsize=(10, 6))
 
     # Initial render
-    vertices = smpl_model(betas=orig_betas).vertices[0].numpy()
+    smpl_out = smpl_model(betas=orig_betas)
+    vertices = smpl_out.vertices[0].numpy()
+    joints = smpl_out.joints[0].numpy()
     if args.no_render:
         scatter_front = ax_front.scatter(vertices[:, 0], vertices[:, 1], s=0.1)
         scatter_side = ax_side.scatter(vertices[:, 2], vertices[:, 1], s=0.1)
-        meas_plots = initialise_meas_lines(ax_front, ax_side, vertices)
+        meas_plots = initialise_meas_lines(ax_front, ax_side, vertices, joints)
         ax_front.set_aspect('equal', adjustable='box')
         ax_side.set_aspect('equal', adjustable='box')
     else:
